@@ -1,4 +1,4 @@
-from PIL import Image, ImageTk, ImageOps
+from PIL import Image, ImageTk
 import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
@@ -12,76 +12,98 @@ class BuyukSayilarYasasiApp(tk.Tk):
         super().__init__()
         self.title("Büyük Sayılar Yasası - 2025 TÜBİTAK")
         self.attributes("-fullscreen", True)
-
-        self.colors = ["#ff4d4d", "#ffa64d", "#ffff66", "#66ff66", "#66b3ff", "#bf80ff"]
-        self.color_index = 0
-
-        self.update_idletasks()
         self.w, self.h = self.winfo_screenwidth(), self.winfo_screenheight()
 
-        # Canvas oluştur
-        self.canvas = tk.Canvas(self, width=self.w, height=self.h, highlightthickness=0)
-        self.canvas.pack(fill="both", expand=True)
-
-        # Arka plan yükle
-        if os.path.exists("background.jpg"):
+        # Arka plan resmi
+        try:
             bg_image = Image.open("background.jpg").resize((self.w, self.h), Image.LANCZOS)
             self.bg_photo = ImageTk.PhotoImage(bg_image)
-            self.canvas.create_image(0, 0, image=self.bg_photo, anchor="nw", tags="background")
-        else:
-            print("background.jpg bulunamadı!")
-            self.bg_photo = None
+            bg_label = tk.Label(self, image=self.bg_photo)
+            bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+            bg_label.lower()
+        except Exception as e:
+            print("Arka plan resmi yüklenemedi:", e)
+            self.configure(bg="black")
+
+        self.widgets = []
+        self.logo_boyut = (400, 400)  # Logoların ortak boyutu
 
         self.baslangic_ekrani()
         self.after(600, self.baslik_renk_efekti)
 
     def baslangic_ekrani(self):
-        # Sadece widgetları temizle (arka planı silme)
-        self.canvas.delete("widget")
+        for widget in self.winfo_children():
+            widget.place_forget()
+            widget.pack_forget()
 
         # Başlık
         self.title_label = tk.Label(self, text="BÜYÜK SAYILAR YASASI", font=("Arial", 42, "bold"),
-                                    bg="#000000", fg="white")
-        self.canvas.create_window(self.w//2, 100, window=self.title_label, tags="widget")
+                                    bg="black", fg="white")
+        self.title_label.pack(pady=40)
 
         # Slider
         self.slider = tk.Scale(self, from_=1000, to=10000, orient="horizontal", resolution=100,
-                              length=500, tickinterval=1000, bg="#1a1a1a", fg="white",
-                              label="Deneme Sayısı Seçin", font=("Arial", 14), troughcolor="#444")
+                               length=500, tickinterval=1000, bg="#1a1a1a", fg="white",
+                               label="Deneme Sayısı Seçin", font=("Arial", 14), troughcolor="#444")
         self.slider.set(5000)
-        self.canvas.create_window(self.w//2, 200, window=self.slider, tags="widget")
+        self.slider.pack(pady=30)
 
-        # Başlat butonu
-        btn_start = tk.Button(self, text="Simülasyonu Başlat", font=("Arial", 18, "bold"),
-                              bg="green", fg="white", command=self.baslat_gecis)
-        self.canvas.create_window(self.w//2, 300, window=btn_start, tags="widget")
+        # Simülasyon başlat butonu
+        tk.Button(self, text="Simülasyonu Başlat", font=("Arial", 18, "bold"),
+                  bg="green", fg="white", command=self.baslat_gecis).pack(pady=20)
 
         # Çıkış butonu
-        btn_exit = tk.Button(self, text="Çıkış", font=("Arial", 12),
-                             bg="red", fg="white", command=self.destroy)
-        self.canvas.create_window(self.w//2, self.h - 50, window=btn_exit, tags="widget")
+        tk.Button(self, text="Çıkış", font=("Arial", 12),
+                  bg="red", fg="white", command=self.destroy).pack(side="bottom", pady=10)
 
         # Logoları göster
-        self.resimleri_goster()
+        self.logo_ekranini_ekle()
+
+    def logo_ekranini_ekle(self):
+        # Logoları yükle ve boyutlandır
+        try:
+            karamehmet_img = Image.open("karamehmet59.png").resize(self.logo_boyut, Image.LANCZOS)
+            meb_img = Image.open("meb.png").resize(self.logo_boyut, Image.LANCZOS)
+
+            self.karamehmet_photo = ImageTk.PhotoImage(karamehmet_img)
+            self.meb_photo = ImageTk.PhotoImage(meb_img)
+
+            frame = tk.Frame(self, bg="", width=self.w, height=self.h)
+            frame.pack(pady=20)
+
+            pad = 40  # Logolar arası boşluk
+
+            label1 = tk.Label(frame, image=self.karamehmet_photo, bg="")
+            label1.pack(side="left", padx=(0, pad))
+            label2 = tk.Label(frame, image=self.meb_photo, bg="")
+            label2.pack(side="left", padx=(pad, 0))
+
+            self.widgets.extend([frame, label1, label2])
+        except Exception as e:
+            print("Logo yüklenemedi:", e)
 
     def baslik_renk_efekti(self):
+        colors = ["#ff4d4d", "#ffa64d", "#ffff66", "#66ff66", "#66b3ff", "#bf80ff"]
         if hasattr(self, "title_label"):
             try:
-                self.title_label.config(fg=self.colors[self.color_index])
-                self.color_index = (self.color_index + 1) % len(self.colors)
+                current_color = colors.pop(0)
+                self.title_label.config(fg=current_color)
+                colors.append(current_color)
+                self.after(600, self.baslik_renk_efekti)
             except:
                 pass
-        self.after(600, self.baslik_renk_efekti)
 
     def baslat_gecis(self):
-        self.canvas.delete("widget")
+        for widget in self.winfo_children():
+            widget.pack_forget()
+            widget.place_forget()
 
         self.status_label = tk.Label(self, text="Simülasyon hazırlanıyor...", font=("Arial", 18),
-                                     bg="#000000", fg="white")
-        self.canvas.create_window(self.w//2, 100, window=self.status_label, tags="widget")
+                                     bg="black", fg="white")
+        self.status_label.pack(pady=40)
 
         self.progress = ttk.Progressbar(self, length=500, mode="determinate")
-        self.canvas.create_window(self.w//2, 150, window=self.progress, tags="widget")
+        self.progress.pack(pady=10)
 
         threading.Thread(target=self.simulasyonu_calistir, daemon=True).start()
 
@@ -157,27 +179,6 @@ class BuyukSayilarYasasiApp(tk.Tk):
         plt.show()
         self.baslangic_ekrani()
 
-    def resimleri_goster(self):
-        dosyalar = ["karamehmet59.png", "meb.png"]
-        boyutlar = [(400, 400), (400, 400)]  # Aynı boyutlarda
-
-        toplam_genislik = sum([b[0] for b in boyutlar])
-        bosluk_sayisi = len(dosyalar) + 1
-        bosluk = (self.w - toplam_genislik) // bosluk_sayisi
-
-        self.fotolar = []
-        x = bosluk
-        y = 450
-
-        for i, dosya in enumerate(dosyalar):
-            try:
-                img = Image.open(dosya).resize(boyutlar[i], Image.LANCZOS)
-                photo = ImageTk.PhotoImage(img)
-                self.fotolar.append(photo)
-                self.canvas.create_image(x + boyutlar[i][0]//2, y, image=photo, tags="widget")
-                x += boyutlar[i][0] + bosluk
-            except Exception as e:
-                print(f"{dosya} yüklenemedi:", e)
 
 if __name__ == "__main__":
     app = BuyukSayilarYasasiApp()
