@@ -1,4 +1,4 @@
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageOps
 import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
@@ -10,72 +10,78 @@ import os
 class BuyukSayilarYasasiApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Buyuk Sayilar Yasasi - 2025 TUBITAK")
+        self.title("Büyük Sayılar Yasası - 2025 TÜBİTAK")
         self.attributes("-fullscreen", True)
-        self.configure(bg="black")
 
         self.colors = ["#ff4d4d", "#ffa64d", "#ffff66", "#66ff66", "#66b3ff", "#bf80ff"]
         self.color_index = 0
 
-        self.update_idletasks()  # pencere boyutunu doğru alabilmek için
-        w, h = self.winfo_screenwidth(), self.winfo_screenheight()
+        self.update_idletasks()
+        self.w, self.h = self.winfo_screenwidth(), self.winfo_screenheight()
 
-        try:
-            if os.path.exists("background.jpg"):
-                bg_image = Image.open("background.jpg").resize((w, h), Image.ANTIALIAS)
-                self.bg_photo = ImageTk.PhotoImage(bg_image)
-                bg_label = tk.Label(self, image=self.bg_photo)
-                bg_label.place(x=0, y=0, relwidth=1, relheight=1)
-                bg_label.lower()
-            else:
-                print("background.jpg bulunamadi!")
-        except Exception as e:
-            print("Arka plan yuklenemedi:", e)
+        # Canvas oluştur
+        self.canvas = tk.Canvas(self, width=self.w, height=self.h, highlightthickness=0)
+        self.canvas.pack(fill="both", expand=True)
+
+        # Arka plan yükle
+        if os.path.exists("background.jpg"):
+            bg_image = Image.open("background.jpg").resize((self.w, self.h), Image.LANCZOS)
+            self.bg_photo = ImageTk.PhotoImage(bg_image)
+            self.canvas.create_image(0, 0, image=self.bg_photo, anchor="nw", tags="background")
+        else:
+            print("background.jpg bulunamadı!")
+            self.bg_photo = None
 
         self.baslangic_ekrani()
         self.after(600, self.baslik_renk_efekti)
 
     def baslangic_ekrani(self):
-        for widget in self.winfo_children():
-            widget.place_forget()
-            widget.pack_forget()
+        # Sadece widgetları temizle (arka planı silme)
+        self.canvas.delete("widget")
 
-        self.title_label = tk.Label(self, text="BUYUK SAYILAR YASASI", font=("Arial", 42, "bold"),
-                                    bg="black", fg="white")
-        self.title_label.pack(pady=40)
+        # Başlık
+        self.title_label = tk.Label(self, text="BÜYÜK SAYILAR YASASI", font=("Arial", 42, "bold"),
+                                    bg="#000000", fg="white")
+        self.canvas.create_window(self.w//2, 100, window=self.title_label, tags="widget")
 
+        # Slider
         self.slider = tk.Scale(self, from_=1000, to=10000, orient="horizontal", resolution=100,
-                               length=500, tickinterval=1000, bg="#1a1a1a", fg="white",
-                               label="Deneme Sayisi Secin", font=("Arial", 14), troughcolor="#444")
+                              length=500, tickinterval=1000, bg="#1a1a1a", fg="white",
+                              label="Deneme Sayısı Seçin", font=("Arial", 14), troughcolor="#444")
         self.slider.set(5000)
-        self.slider.pack(pady=30)
+        self.canvas.create_window(self.w//2, 200, window=self.slider, tags="widget")
 
-        tk.Button(self, text="Simulasyonu Baslat", font=("Arial", 18, "bold"),
-                  bg="green", fg="white", command=self.baslat_gecis).pack(pady=20)
+        # Başlat butonu
+        btn_start = tk.Button(self, text="Simülasyonu Başlat", font=("Arial", 18, "bold"),
+                              bg="green", fg="white", command=self.baslat_gecis)
+        self.canvas.create_window(self.w//2, 300, window=btn_start, tags="widget")
 
-        tk.Button(self, text="Cikis", font=("Arial", 12),
-                  bg="red", fg="white", command=self.destroy).pack(side="bottom", pady=10)
+        # Çıkış butonu
+        btn_exit = tk.Button(self, text="Çıkış", font=("Arial", 12),
+                             bg="red", fg="white", command=self.destroy)
+        self.canvas.create_window(self.w//2, self.h - 50, window=btn_exit, tags="widget")
+
+        # Logoları göster
+        self.resimleri_goster()
 
     def baslik_renk_efekti(self):
         if hasattr(self, "title_label"):
             try:
                 self.title_label.config(fg=self.colors[self.color_index])
                 self.color_index = (self.color_index + 1) % len(self.colors)
-                self.after(600, self.baslik_renk_efekti)
             except:
                 pass
+        self.after(600, self.baslik_renk_efekti)
 
     def baslat_gecis(self):
-        for widget in self.winfo_children():
-            widget.pack_forget()
-            widget.place_forget()
+        self.canvas.delete("widget")
 
-        self.status_label = tk.Label(self, text="Simulasyon hazirlaniyor...", font=("Arial", 18),
-                                     bg="black", fg="white")
-        self.status_label.pack(pady=40)
+        self.status_label = tk.Label(self, text="Simülasyon hazırlanıyor...", font=("Arial", 18),
+                                     bg="#000000", fg="white")
+        self.canvas.create_window(self.w//2, 100, window=self.status_label, tags="widget")
 
         self.progress = ttk.Progressbar(self, length=500, mode="determinate")
-        self.progress.pack(pady=10)
+        self.canvas.create_window(self.w//2, 150, window=self.progress, tags="widget")
 
         threading.Thread(target=self.simulasyonu_calistir, daemon=True).start()
 
@@ -88,10 +94,10 @@ class BuyukSayilarYasasiApp(tk.Tk):
         zar_sayilari = [[] for _ in range(6)]
 
         sozler = [
-            "🎲 Zarlar yuvarlaniyor...", "🪙 Yazi tura atiliyor...",
-            "👶 Cinsiyet belirleniyor...", "📊 Sonuçlar hesaplaniyor...",
-            "💭 Hayallerin kadar buyuksun.", "🌌 Evren anlamla doludur.",
-            "📚 Bilgi guçtur.", "🌠 2025 TuBITAK: Geleceği birlikte yaziyoruz!"
+            "🎲 Zarlar yuvarlanıyor...", "🪙 Yazı tura atılıyor...",
+            "👶 Cinsiyet belirleniyor...", "📊 Sonuçlar hesaplanıyor...",
+            "💭 Hayallerin kadar büyüksün.", "🌌 Evren anlamla doludur.",
+            "📚 Bilgi güçtür.", "🌠 2025 TÜBİTAK: Geleceği birlikte yazıyoruz!"
         ]
         random.shuffle(sozler)
 
@@ -125,16 +131,16 @@ class BuyukSayilarYasasiApp(tk.Tk):
             if step % 100 == 0:
                 self.progress["value"] = step
 
-        self.status_label.config(text="Grafikler hazirlaniyor...")
+        self.status_label.config(text="Grafikler hazırlanıyor...")
         time.sleep(1)
         self.grafikleri_goster(yazi_sayilari, tura_sayilari, zar_sayilari, kiz_sayilari, erkek_sayilari)
 
     def grafikleri_goster(self, yazi_sayilari, tura_sayilari, zar_sayilari, kiz_sayilari, erkek_sayilari):
         fig, axs = plt.subplots(1, 3, figsize=(18, 5))
-        axs[0].plot(yazi_sayilari, label=f"Yazi %{yazi_sayilari[-1]:.2f}")
+        axs[0].plot(yazi_sayilari, label=f"Yazı %{yazi_sayilari[-1]:.2f}")
         axs[0].plot(tura_sayilari, label=f"Tura %{tura_sayilari[-1]:.2f}")
         axs[0].axhline(50, color='gray', linestyle='--')
-        axs[0].legend(); axs[0].set_title("Yazi Tura"); axs[0].grid()
+        axs[0].legend(); axs[0].set_title("Yazı Tura"); axs[0].grid()
 
         renkler = ['blue', 'orange', 'green', 'red', 'purple', 'brown']
         for i in range(6):
@@ -142,7 +148,7 @@ class BuyukSayilarYasasiApp(tk.Tk):
         axs[1].axhline(100/6, color='gray', linestyle='--')
         axs[1].legend(); axs[1].set_title("Zar"); axs[1].grid()
 
-        axs[2].plot(kiz_sayilari, label=f"Kiz %{kiz_sayilari[-1]:.2f}")
+        axs[2].plot(kiz_sayilari, label=f"Kız %{kiz_sayilari[-1]:.2f}")
         axs[2].plot(erkek_sayilari, label=f"Erkek %{erkek_sayilari[-1]:.2f}")
         axs[2].axhline(50, color='gray', linestyle='--')
         axs[2].legend(); axs[2].set_title("Cinsiyet"); axs[2].grid()
@@ -150,6 +156,28 @@ class BuyukSayilarYasasiApp(tk.Tk):
         plt.tight_layout()
         plt.show()
         self.baslangic_ekrani()
+
+    def resimleri_goster(self):
+        dosyalar = ["karamehmet59.png", "meb.png"]
+        boyutlar = [(400, 400), (400, 400)]  # Aynı boyutlarda
+
+        toplam_genislik = sum([b[0] for b in boyutlar])
+        bosluk_sayisi = len(dosyalar) + 1
+        bosluk = (self.w - toplam_genislik) // bosluk_sayisi
+
+        self.fotolar = []
+        x = bosluk
+        y = 450
+
+        for i, dosya in enumerate(dosyalar):
+            try:
+                img = Image.open(dosya).resize(boyutlar[i], Image.LANCZOS)
+                photo = ImageTk.PhotoImage(img)
+                self.fotolar.append(photo)
+                self.canvas.create_image(x + boyutlar[i][0]//2, y, image=photo, tags="widget")
+                x += boyutlar[i][0] + bosluk
+            except Exception as e:
+                print(f"{dosya} yüklenemedi:", e)
 
 if __name__ == "__main__":
     app = BuyukSayilarYasasiApp()
