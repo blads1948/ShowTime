@@ -11,7 +11,7 @@ Arka plan resmi ve logolarla zenginleştirilmiş tam ekran bir arayüzde çalı�
 
 - **Tam ekran Tkinter uygulaması**
 - Arka plan resmi (`background.jpg`) tam ekran olarak gösterilir
-- İki logo (`karamehmet59.png` ve `meb.png`) ortalanmış ve boyutlandırılmış şekilde yer alır
+- İki logo ekrana ortalanmış ve boyutlandırılmış şekilde yer alır
 - Kullanıcı tarafından deneme sayısı slider ile seçilebilir (1000-10000 arası)
 - Simülasyon: Yazı-tura, cinsiyet dağılımı ve zar atışı simülasyonu
 - İlerleme çubuğu ve dinamik durum mesajları
@@ -22,9 +22,10 @@ Arka plan resmi ve logolarla zenginleştirilmiş tam ekran bir arayüzde çalı�
 ### Gereksinimler
 
 - Python 3.x
+- Matplotlib kütüphanesi:
 - Pillow (PIL) kütüphanesi:  
   ```bash
-  pip install pillow
+  pip install pillow matplotlib
   
 ## Lisans ve Kullanım Koşulları
 
