@@ -1,18 +1,22 @@
-# Özel Kullanım Lisansı (Proprietary License)
+# Özel ve Kesin Kullanım Lisansı (Proprietary License)
 
 © 2025 Blads. Tüm hakları saklıdır.
 
-Bu yazılım ve kaynak kodları Blads'a aittir ve telif hakkı ile korunmaktadır. 
+## Lisans Koşulları
 
-## Kullanım Koşulları
+1. Bu yazılım, kaynak kodları ve tüm ilgili materyaller Blads'ın mülkiyetindedir ve telif hakları, fikri mülkiyet ve ilgili tüm yasalarla korunmaktadır.
 
-1. Bu kodun tamamı veya herhangi bir parçası, açık veya gizli şekilde, izinsiz kopyalanamaz, çoğaltılamaz, dağıtılamaz, değiştirilemez veya üçüncü taraflara iletilemez.
+2. Yazılımın herhangi bir şekilde, tamamının veya bir kısmının:
 
-2. Kaynak kodun obfuscate (karmaşıklaştırılmış) hali dışındaki herhangi bir biçimde (deobfuscate edilmiş, değiştirilmiş veya türetilmiş) kullanımı, çoğaltılması veya dağıtımı ancak Blads'ın yazılı izni ile mümkündür.
+   - Kopyalanması, çoğaltılması, dağıtılması, kiralanması, ödünç verilmesi, değiştirilmesi, türetilmiş eserler oluşturulması,
+   - Obfuscate edilmiş kodun tersine mühendislik (deobfuscate edilmesi), ayrıştırılması, çözülmesi veya başka biçimlere dönüştürülmesi,
+   - Herhangi bir ticari veya ticari olmayan amaçla kullanılması,
 
-3. Bu projeye ilişkin herhangi bir ticari veya ticari olmayan kullanım için önceden yazılı izin alınması zorunludur.
+   **Blads'ın önceden yazılı açık izni olmadan kesinlikle yasaktır.**
 
-4. Lisans sahibi, bu lisans koşullarına uymayan kullanımlara karşı yasal haklarını saklı tutar.
+3. Bu yazılımın izinsiz kullanımı, çoğaltılması veya dağıtımı yasal işlem konusu olup, tüm hukuki haklar saklıdır.
+
+4. Projenin kullanımıyla ilgili talepler, izin ve lisanslandırma için aşağıdaki iletişim bilgilerinden Blads ile temasa geçilmelidir.
 
 ## İletişim
 
@@ -25,4 +29,5 @@ GitHub: https://github.com/blads
 ---
 
 Bu lisans, projenin güvenliğini ve hak sahibinin kontrolünü korumak için hazırlanmıştır. İzinsiz kullanımlar yasal işlem gerektirir.
+Bu lisans, projenin gizliliğini ve sahibinin tüm haklarını maksimum düzeyde korumak üzere hazırlanmıştır. Lisans dışı kullanım durumlarında yasal haklarınızın korunmayacağını unutmayınız.
 
